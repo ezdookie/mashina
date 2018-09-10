@@ -1,13 +1,14 @@
 import falcon
-from config import settings, routes
-from mashina.router import MashinaRouter
+from config import settings
+from mashina.routing.router import MashinaRouter
+from mashina.routing.base import root_routes
 from mashina.utils.misc import import_string
 
 
 class App(falcon.API):
 
     def add_routes(self):
-        for route in routes.root_routes:
+        for route in root_routes:
             self.add_route(*route)
 
     def get_middlewares(self):
