@@ -45,7 +45,8 @@ class APICollectionControllerMixin(object):
                 order_by=self.query_params['ordering'],
                 limit=self.query_params['limit'],
                 offset=self.query_params['offset'],
-                filters=self.query_params.get('filters')
+                filters=self.query_params.get('filters'),
+                filters_from_route=self.query_params.get('filters_from_route')
             )
         )
 
@@ -55,11 +56,16 @@ class APICollectionControllerMixin(object):
         req.get_param_as_int('limit', store=self.query_params)
         req.get_param_as_int('offset', store=self.query_params)
 
-    def get_response(self, req, resp):
+    def add_filters_from_route(self, **kwargs):
+        if kwargs:
+            self.query_params['filters_from_route'] = kwargs
+
+    def get_response(self, req, resp, **kwargs):
         self.collect_params(req)
         self.objects_count = self.model.count()
         if hasattr(self.schema.Meta, 'filter_fields'):
             self.query_params['filters'] = {k: v for k, v in req.params.items() if k in self.schema.Meta.filter_fields}
+        self.add_filters_from_route(**kwargs)
         return {
             'count': self.objects_count,
             'next': self.get_next_page(req),

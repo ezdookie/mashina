@@ -37,11 +37,13 @@ class _Base(object):
     #     return json.dumps(self.to_dict(rel), default=extended_encoder)
 
     @classmethod
-    def all(cls, limit=20, offset=0, order_by=None, filters=None):
+    def all(cls, limit=20, offset=0, order_by=None, filters=None, filters_from_route=None):
         queryset = Session.query(cls)
         if filters:
             _filters = [getattr(cls, k).like('%%%s%%' % v) for k, v in filters.items()]
             queryset = queryset.filter(or_(*_filters))
+        if filters_from_route:
+            queryset = queryset.filter_by(**filters_from_route)
         if order_by:
             _order_by = getattr(cls, order_by[1:] if order_by.startswith('-') else order_by)
             if order_by.startswith('-'):

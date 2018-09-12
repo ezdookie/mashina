@@ -14,8 +14,8 @@ class APIBaseController(object):
 
 class APIController(APICollectionControllerMixin, APIResourceControllerMixin, APIBaseController):
 
-    def on_get(self, req, resp):
-        resp.context['response'] = self.get_response(req, resp)
+    def on_get(self, req, resp, **kwargs):
+        resp.context['response'] = self.get_response(req, resp, **kwargs)
 
     def on_post(self, req, resp):
         # schema = self.schema().dump(req.context['request'])
