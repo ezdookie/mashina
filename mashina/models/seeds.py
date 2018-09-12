@@ -5,12 +5,12 @@ from mashina.db import Session
 session = Session()
 
 
-def do_seeds():
-    data = json.load(open('seeds/base.json', 'r'))
+def do_seed(file_name):
+    data = json.load(open('seeds/%s.json' % file_name, 'r'))
 
     for dict_obj in data:
-        for model in dict_obj:
-            model = import_string(model)
+        for model_name in dict_obj:
+            model = import_string(model_name)
             session.add(model(**dict_obj[model_name]))
             session.commit()
 

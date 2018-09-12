@@ -1,6 +1,6 @@
 import click
 from mashina.utils.skeleton import generate_file_from_tpl
-from mashina.models.seeds import do_seeds
+from mashina.models.seeds import do_seed
 
 
 @click.group()
@@ -24,5 +24,6 @@ def generate(name):
     models_file.close()
 
 @main.command()
-def seeds():
-    do_seeds()
+@click.argument('file_name')
+def seed(file_name):
+    do_seed(file_name)
