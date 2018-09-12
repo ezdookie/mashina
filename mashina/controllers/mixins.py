@@ -46,7 +46,7 @@ class APICollectionControllerMixin(object):
                 limit=self.query_params['limit'],
                 offset=self.query_params['offset'],
                 filters=self.query_params.get('filters'),
-                filters_from_route=self.query_params.get('filters_from_route')
+                filters_from_route=self.query_params['filters_from_route']
             )
         )
 
@@ -57,8 +57,7 @@ class APICollectionControllerMixin(object):
         req.get_param_as_int('offset', store=self.query_params)
 
     def add_filters_from_route(self, **kwargs):
-        if kwargs:
-            self.query_params['filters_from_route'] = kwargs
+        self.query_params['filters_from_route'] = kwargs
 
     def get_response(self, req, resp, **kwargs):
         self.collect_params(req)
