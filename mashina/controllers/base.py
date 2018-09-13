@@ -17,10 +17,11 @@ class APIController(APICollectionControllerMixin, APIResourceControllerMixin, AP
     def on_get(self, req, resp, **kwargs):
         resp.context['response'] = self.get_response(req, resp, **kwargs)
 
-    def on_post(self, req, resp):
+    def on_post(self, req, resp, **kwargs):
         # schema = self.schema().dump(req.context['request'])
         # req.context['session'].add(self.model(**schema.data))
         # req.context['session'].commit()
+        req.context['request'].update(kwargs)
         obj = self.schema().load(req.context['request'], session=req.context['session']).data
         req.context['session'].add(obj)
         req.context['session'].commit()
