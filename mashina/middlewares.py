@@ -14,7 +14,7 @@ class Initializer(object):
 
 class JSONTranslator(object):
 
-    def process_request(self, req, resp):
+    def process_resource(self, req, resp, resource, params):
         req.context['request'] = {}
 
         if req.content_length in (None, 0):
