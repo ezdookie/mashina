@@ -59,50 +59,9 @@ class _Base(object):
     def get_one(cls, id):
         return Session.query(cls).get(id)
 
-    # @classmethod
-    # def get_by(cls, **kw):
-    #     return Session.query(cls).filter_by(**kw).first()
-    #
-    # @classmethod
-    # def get_or_create(cls, **kw):
-    #     r = cls.get_by(**kw)
-    #     if r:
-    #         return r
-    #
-    #     return cls.create(**kw)
-    #
-    # @classmethod
-    # def create(cls, **kw):
-    #     r = cls(**kw)
-    #     Session.add(r)
-    #     return r
-    #
-    # @classmethod
-    # def insert(cls, **kw):
-    #     Session.execute(cls.__table__.insert(values=kw)).close()
-    #
-    # @classmethod
-    # def insert_many(cls, iter):
-    #     Session.execute(cls.__table__.insert(), list(iter)).close()
-    #
-    # @classmethod
-    # def all(cls):
-    #     return Session.query(cls).all()
-    #
-    # @classmethod
-    # def count(cls):
-    #     return Session.query(cls).count()
-    #
-    # def delete(self):
-    #     Session.delete(self)
-    #
-    # def refresh(self):
-    #     Session.refresh(self)
-    #
-    # def __repr__(self):
-    #     values = ', '.join("%s=%r" % (n, getattr(self, n)) for n in self.__table__.c.keys())
-    #     return "%s(%s)" % (self.__class__.__name__, values)
-    #
+    @classmethod
+    def get_by(cls, **kwargs):
+        return Session.query(cls).filter_by(**kwargs).first()
 
 
 Base = declarative_base(cls=_Base)
