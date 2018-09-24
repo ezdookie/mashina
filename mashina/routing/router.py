@@ -18,8 +18,9 @@ class MashinaRouter(CompiledRouter):
 
     def map_http_methods(self, resource, methods):
         method_map = {}
+        _methods = {k: v for k, v in methods.items() if k not in resource.excluded_methods}
 
-        for method_key, method_value in methods.items():
+        for method_key, method_value in _methods.items():
             responder = getattr(resource, method_value)
             if callable(responder):
                 method_map[method_key] = responder
@@ -27,6 +28,6 @@ class MashinaRouter(CompiledRouter):
         return method_map
 
     def add_route(self, uri_template, method_map, resource, *args):
-        method_map = self.map_http_methods(resource, defined_methods[args[0]])
+        method_map = self.map_http_methods(resource, defined_methods[resource.controller_type])
         util.set_default_responders(method_map)
         super().add_route(uri_template, method_map, resource)

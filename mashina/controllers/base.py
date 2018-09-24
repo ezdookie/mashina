@@ -4,8 +4,9 @@ from mashina.controllers.mixins import APICollectionGETMixin, APICollectionPOSTM
 
 class APIBaseController(object):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, controller_type, exclude=None, *args, **kwargs):
+        self.controller_type = controller_type
+        self.excluded_methods = exclude or []
         self.model = self.Schema.Meta.model
 
     @property
