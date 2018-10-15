@@ -5,11 +5,11 @@ from config import settings
 
 class JWTAuthMiddleware(object):
     def process_resource(self, req, resp, resource, params):
-        r = redis.StrictRedis(host='redis', db=0)
-        token = req.auth.split(' ')
-        if len(token) > 1:
+        try:
+            r = redis.StrictRedis(host='redis', db=0)
+            token = req.auth.split(' ')
             token = r.get(token[1])
-        else:
+        except:
             token = None
         # token = req.auth
         if token is not None:
