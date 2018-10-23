@@ -5,8 +5,8 @@ from mashina.db import Session
 session = Session()
 
 
-def do_seed(file_name):
-    data = json.load(open('seeds/%s.json' % file_name, 'r'))
+def do_seed(file_path):
+    data = json.load(open('%s.json' % file_path, 'r'))
 
     for dict_obj in data:
         for model_name in dict_obj:
