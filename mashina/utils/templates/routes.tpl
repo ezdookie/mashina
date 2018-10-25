@@ -1,7 +1,7 @@
-from apps.${name_slug}.controllers import ${name}APIController
+from apps.${plural}.controllers import ${singular_capitalized}APIController
 from mashina.constants import CONTROLLER_COLLECTION, CONTROLLER_RESOURCE
 
 routes = [
-    ('/${name_slug}/', ${name}APIController(CONTROLLER_COLLECTION)),
-    ('/${name_slug}/{${name_slug}_id:uuid}', ${name}APIController(CONTROLLER_RESOURCE)),
+    ('/${plural}/', ${singular_capitalized}APIController(CONTROLLER_COLLECTION)),
+    ('/${plural}/{${singular}_id:uuid}', ${singular_capitalized}APIController(CONTROLLER_RESOURCE)),
 ]

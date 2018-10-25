@@ -1,7 +1,7 @@
 from marshmallow_sqlalchemy import ModelSchema
-from apps.${name_slug}.models import ${name}
+from apps.${plural}.models import ${singular_capitalized}
 
 
-class ${name}Schema(ModelSchema):
+class ${singular_capitalized}Schema(ModelSchema):
     class Meta:
-        model = ${name}
+        model = ${singular_capitalized}

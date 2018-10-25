@@ -11,10 +11,10 @@ def generate_file_from_tpl(tpl_file, file_out, data):
     file_out.close()
 
 
-def generate_app_folder(files, data):
+def generate_app_folder(files, singular, plural):
     src_path = os.path.dirname(os.path.abspath(__file__)) + '/templates/'
 
-    dst_path = 'apps/%s' % data['name_slug']
+    dst_path = 'apps/%s' % plural
     if not os.path.exists(dst_path):
         os.makedirs(dst_path)
 
@@ -22,5 +22,6 @@ def generate_app_folder(files, data):
     init_file.close()
 
     for file in files:
-        generate_file_from_tpl('%s/%s.tpl' % (src_path, file),
-            '%s/%s.py' % (dst_path, file), data)
+        generate_file_from_tpl(
+            '%s/%s.tpl' % (src_path, file), '%s/%s.py' % (dst_path, file),
+            {'singular': singular, 'singular_capitalized': singular.capitalize(), 'plural': plural})

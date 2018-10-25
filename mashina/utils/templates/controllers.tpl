@@ -1,6 +1,6 @@
 from mashina.controllers.base import APIController
-from apps.${name_slug}.schemas import ${name}Schema
+from apps.${plural}.schemas import ${singular_capitalized}Schema
 
 
-class ${name}APIController(APIController):
-    Schema = ${name}Schema
+class ${singular_capitalized}APIController(APIController):
+    Schema = ${singular_capitalized}Schema

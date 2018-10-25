@@ -9,11 +9,11 @@ def main():
 
 
 @main.command()
-@click.argument('name')
-def generate(name):
-    data = {'name': name, 'name_slug': name.lower()}
-    generate_app_folder(['controllers', 'models', 'routes', 'schemas'], data)
-    click.echo('App %s successfully created!' % name)
+@click.argument('singular')
+@click.argument('plural')
+def generate(singular, plural):
+    generate_app_folder(['controllers', 'models', 'routes', 'schemas'], singular, plural)
+    click.echo('App successfully created...!')
 
 
 @main.command()
