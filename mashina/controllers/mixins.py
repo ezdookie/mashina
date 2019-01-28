@@ -77,14 +77,18 @@ class APICollectionGETMixin(object):
 
 class APICollectionPOSTMixin(object):
     def save_obj(self, req):
-        # schema = self.Schema().dump(req.context['request'])
-        # req.context['session'].add(self.model(**schema.data))
-        # req.context['session'].commit()
-        schema = self.Schema()
-        obj = schema.load(req.context['request'], session=req.context['session']).data
+        # ctx = req.context
+        # schema = self.Schema()
+        # obj = schema.load(ctx['request'], session=ctx['session'])
+        obj = self.validate(self.req['context'])
         req.context['session'].add(obj)
         req.context['session'].commit()
         return obj
+
+    def validate(self, data):
+        schema = self.Schema()
+        marsh = schema.load(ctx['request'], session=self.req.context['session'])
+        return obj.data
 
     def get_saved_obj(self, obj):
         return obj.to_dict()
@@ -94,6 +98,7 @@ class APICollectionPOSTMixin(object):
         return self.get_saved_obj(self.save_obj(req))
 
     def on_post(self, req, resp, **kwargs):
+        super().on_post(req, resp, **kwargs)
         resp.context['response'] = self.post_response(req, resp, **kwargs)
 
 

@@ -8,6 +8,8 @@ class APIBaseController(object):
         self.controller_type = controller_type
         self.excluded_methods = exclude or []
         self.model = self.Schema.Meta.model
+        self.req = None
+        self.resp = None
 
     @property
     def Schema(self):
