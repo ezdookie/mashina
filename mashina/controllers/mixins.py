@@ -1,3 +1,6 @@
+import falcon
+
+
 class APICollectionGETMixin(object):
     query_params = {}
     objects_count = 0
@@ -76,30 +79,33 @@ class APICollectionGETMixin(object):
 
 
 class APICollectionPOSTMixin(object):
-    def save_obj(self, req):
-        # ctx = req.context
-        # schema = self.Schema()
-        # obj = schema.load(ctx['request'], session=ctx['session'])
-        obj = self.validate(self.req['context'])
-        req.context['session'].add(obj)
-        req.context['session'].commit()
+    def add_obj(self, data, schema, ignore=False):
+        obj = self.validate(data, schema, ignore)
+        session = self.req.context['session']
+        session.add(obj)
         return obj
 
-    def validate(self, data):
-        schema = self.Schema()
-        marsh = schema.load(ctx['request'], session=self.req.context['session'])
-        return obj.data
+    def add_child(self, field, data, schema, ignore=False):
+        obj = self.validate(data, schema, ignore)
+        getattr(self.obj, field).append(obj)
+        return obj
 
-    def get_saved_obj(self, obj):
-        return obj.to_dict()
+    def commit(self):
+        session = self.req.context['session']
+        session.commit()
 
-    def post_response(self, req, resp, **kwargs):
-        req.context['request'].update(kwargs)
-        return self.get_saved_obj(self.save_obj(req))
+    def validate(self, data, schema, ignore):
+        marsh = schema.load(data, partial=ignore, session=self.req.context['session'])
+        if marsh.errors:
+            raise falcon.HTTPBadRequest('Validation error', marsh.errors)
+        return marsh.data
 
-    def on_post(self, req, resp, **kwargs):
-        super().on_post(req, resp, **kwargs)
-        resp.context['response'] = self.post_response(req, resp, **kwargs)
+    def get_post_response(self, **kwargs):
+        ctx = self.req.context
+        ctx['request'].update(kwargs)
+        self.obj = self.add_obj(ctx['request'], self.Schema())
+        self.commit()
+        return self.obj.to_dict()
 
 
 class APIResourceControllerMixin(object):
