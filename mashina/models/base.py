@@ -37,19 +37,19 @@ class _Base(object):
     #     return json.dumps(self.to_dict(rel), default=extended_encoder)
 
     @classmethod
-    def all(cls, limit=20, offset=0, order_by=None, filters=None, filters_from_route=None):
+    def all(cls, limit=20, offset=0, order_by=None, filters=None, exact_filters=None):
         queryset = Session.query(cls)
         if filters:
             _filters = [getattr(cls, k).like('%%%s%%' % v) for k, v in filters.items()]
             queryset = queryset.filter(or_(*_filters))
-        if filters_from_route:
-            queryset = queryset.filter_by(**filters_from_route)
+        if exact_filters:
+            queryset = queryset.filter_by(**exact_filters)
         if order_by:
             _order_by = getattr(cls, order_by[1:] if order_by.startswith('-') else order_by)
             if order_by.startswith('-'):
                 _order_by = _order_by.desc()
             queryset = queryset.order_by(_order_by)
-        return queryset.limit(limit).offset(offset).all()
+        return queryset.count(), queryset.limit(limit).offset(offset).all()
 
     @classmethod
     def count(cls):

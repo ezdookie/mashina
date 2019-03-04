@@ -42,15 +42,14 @@ class APICollectionGETMixin(object):
         )
 
     def get_results(self):
-        return self.objects_to_list(
-            self.model.all(
-                order_by=self.query_params['ordering'],
-                limit=self.query_params['limit'],
-                offset=self.query_params['offset'],
-                filters=self.query_params.get('filters'),
-                filters_from_route=self.query_params['filters_from_route']
-            )
+        count, query_results = self.model.all(
+            order_by=self.query_params['ordering'],
+            limit=self.query_params['limit'],
+            offset=self.query_params['offset'],
+            filters=self.query_params.get('filters'),
+            exact_filters=self.query_params['exact_filters']
         )
+        return count, self.objects_to_list(query_results)
 
     def collect_params(self, req):
         req.get_param('ordering', store=self.query_params)
@@ -58,20 +57,21 @@ class APICollectionGETMixin(object):
         req.get_param_as_int('limit', store=self.query_params)
         req.get_param_as_int('offset', store=self.query_params)
 
-    def add_filters_from_route(self, **kwargs):
-        self.query_params['filters_from_route'] = kwargs
+    def add_exact_filters(self, **kwargs):
+        self.query_params['exact_filters'] = kwargs
 
     def get_response(self, req, resp, **kwargs):
         self.collect_params(req)
-        self.objects_count = self.model.count()
         if hasattr(self.Schema.Meta, 'filter_fields'):
             self.query_params['filters'] = {k: v for k, v in req.params.items() if k in self.Schema.Meta.filter_fields}
-        self.add_filters_from_route(**kwargs)
+        self.add_exact_filters(**kwargs)
+        self.add_exact_filters(**req.context['exact_filters'])
+        count, results = self.get_results()
         return {
-            'count': self.objects_count,
+            'count': count,
             'next': self.get_next_page(req),
             'previous': self.get_prev_page(req),
-            'results': self.get_results()
+            'results': results
         }
 
     def on_get(self, req, resp, **kwargs):
