@@ -43,7 +43,7 @@ class APICollectionGETMixin(object):
 
     def get_results(self):
         count, query_results = self.model.all(
-            order_by=self.query_params['ordering'],
+            order_by=self.query_params['sort'],
             limit=self.query_params['limit'],
             offset=self.query_params['offset'],
             filters=self.query_params.get('filters'),
@@ -52,7 +52,7 @@ class APICollectionGETMixin(object):
         return count, self.objects_to_list(query_results)
 
     def collect_params(self, req):
-        req.get_param('ordering', store=self.query_params)
+        req.get_param('sort', store=self.query_params, default='id')
         req.get_param_as_list('include', store=self.query_params)
         req.get_param_as_int('limit', store=self.query_params)
         req.get_param_as_int('offset', store=self.query_params)
