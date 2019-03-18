@@ -18,9 +18,9 @@ class _Base(object):
                     if value is None:
                         res[relation.key] = None
                     elif isinstance(value.__class__, DeclarativeMeta):
-                        res[relation.key] = value.to_dict(backref=self.__table__)
+                        res[relation.key] = value.to_dict(backref=self.__table__, include=include)
                     else:
-                        res[relation.key] = [i.to_dict(backref=self.__table__)
+                        res[relation.key] = [i.to_dict(backref=self.__table__, include=include)
                                              for i in value]
 
         return res
