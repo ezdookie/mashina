@@ -110,7 +110,7 @@ class APICollectionPOSTMixin(object):
 
 class APIResourceControllerMixin(object):
     def get_id_keyword(self):
-        return '%s_id' % self.model.__name__.lower()
+        return '%s_id' % self.model.__table__.name.lower()
 
     def get_result_one(self, id):
         return self.model.get_one(id).to_dict()
