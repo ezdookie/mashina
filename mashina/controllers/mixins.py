@@ -1,119 +1,112 @@
 import falcon
+from mashina.utils.serialize import get_nested_fields
 
 
-class APICollectionGETMixin(object):
-    query_params = {}
-    objects_count = 0
+class APIListMixin(object):
 
-    def objects_to_list(self, objects):
-        # schema = self.Schema()
-        # return [schema.dump(obj).data for obj in objects]
-        return [obj.to_dict(include=self.query_params.get('include')) for obj in objects]
-
-    def get_querystring(self, params):
-        querystring = '?'
-        for k, v in params.items():
-            querystring += '%s=%s&' % (k, v)
-        return querystring[:-1]
-
-    def get_absolute_url(self, req):
-        return '{scheme}://{netloc}'.format(
-            scheme=req.scheme,
-            netloc=req.netloc
-        )
-
-    def get_next_page(self, req):
-        limit, offset = self.query_params['limit'], self.query_params['offset']+self.query_params['limit']
-        return self.get_nextprev(req, {
-            'limit': limit, 'offset': offset
-        }) if offset < self.objects_count else None
-
-    def get_prev_page(self, req):
-        limit, offset = self.query_params['limit'], max(0, self.query_params['offset']-self.query_params['limit'])
-        return self.get_nextprev(req, {
-            'limit': limit, 'offset': offset
-        }) if self.query_params['offset'] > 0 else None
-
-    def get_nextprev(self, req, params):
-        return '{absolute_url}{path}{querystring}'.format(
-            absolute_url=self.get_absolute_url(req),
-            path=req.path,
-            querystring=self.get_querystring(params)
-        )
+    def get_response(self, **kwargs):
+        self.collect_get_params()
+        self.objects_count, results = self.get_results()
+        return {
+            'count': self.objects_count,
+            'next': self.get_next_page(),
+            'previous': self.get_prev_page(),
+            'results': results
+        }
 
     def get_results(self):
-        count, query_results = self.model.all(
+        schema = self.get_schema(
+            many=True,
+            exclude=[e for e in get_nested_fields(self.Schema) \
+                if e not in self.query_params['include']]
+        )
+        objects_count, objs = self.Schema.Meta.model.all(
             order_by=self.query_params['sort'],
             limit=self.query_params['limit'],
             offset=self.query_params['offset'],
             filters=self.query_params.get('filters'),
             exact_filters=self.query_params['exact_filters']
         )
-        return count, self.objects_to_list(query_results)
+        return objects_count, schema.dump(objs).data
 
-    def collect_params(self, req):
-        self.query_params['sort'] = req.get_param('sort', default='id')
-        req.get_param_as_list('include', store=self.query_params)
-        req.get_param_as_int('limit', store=self.query_params)
-        req.get_param_as_int('offset', store=self.query_params)
-
-    def add_exact_filters(self, **kwargs):
-        self.query_params['exact_filters'] = kwargs
-
-    def get_response(self, req, resp, **kwargs):
-        self.collect_params(req)
+    def collect_get_params(self, **kwargs):
         if hasattr(self.Schema.Meta, 'filter_fields'):
-            self.query_params['filters'] = {k: v for k, v in req.params.items() if k in self.Schema.Meta.filter_fields}
-        self.add_exact_filters(**kwargs)
-        self.add_exact_filters(**req.context['exact_filters'])
-        count, results = self.get_results()
-        return {
-            'count': count,
-            'next': self.get_next_page(req),
-            'previous': self.get_prev_page(req),
-            'results': results
-        }
+            self.query_params['filters'] = {k: v for k, v in self.req.params.items() \
+                if k in self.Schema.Meta.filter_fields}
+        self.query_params['sort'] = self.req.get_param('sort', default='id')
+        self.query_params['include'] = self.req.get_param_as_list('include', default=[])
+        self.query_params['limit'] = self.req.get_param_as_int('limit', default=20)
+        self.query_params['offset'] = self.req.get_param_as_int('offset', default=0)
+        self.query_params['exact_filters'] = {**kwargs, **self.req.context.get('exact_filters', {})}
 
-    def on_get(self, req, resp, **kwargs):
-        resp.context['response'] = self.get_response(req, resp, **kwargs)
+    def get_next_page(self):
+        limit, offset = self.query_params['limit'], self.query_params['offset']+self.query_params['limit']
+        return self.get_nextprev({
+            'limit': limit, 'offset': offset
+        }) if offset < self.objects_count else None
+
+    def get_prev_page(self):
+        limit, offset = self.query_params['limit'], max(0, self.query_params['offset']-self.query_params['limit'])
+        return self.get_nextprev({
+            'limit': limit, 'offset': offset
+        }) if self.query_params['offset'] > 0 else None
+
+    def get_nextprev(self, params):
+        absolute_url = '{scheme}://{netloc}'.format(
+            scheme=self.req.scheme,
+            netloc=self.req.netloc
+        )
+        querystring = '?'
+        for k, v in params.items():
+            querystring += '%s=%s&' % (k, v)
+        return '{absolute_url}{path}{querystring}'.format(
+            absolute_url=absolute_url,
+            path=self.req.path,
+            querystring=querystring[:-1]
+        )
 
 
-class APICollectionPOSTMixin(object):
-    def add_obj(self, data, schema, ignore=False):
-        obj = self.validate(data, schema, ignore)
-        session = self.req.context['session']
-        session.add(obj)
-        return obj
-
-    def add_child(self, field, data, schema, ignore=False):
-        obj = self.validate(data, schema, ignore)
-        getattr(self.obj, field).append(obj)
-        return obj
-
-    def commit(self):
-        session = self.req.context['session']
-        session.commit()
-
-    def validate(self, data, schema, ignore):
-        marsh = schema.load(data, partial=ignore, session=self.req.context['session'])
-        if marsh.errors:
-            raise falcon.HTTPBadRequest('Validation error', marsh.errors)
-        return marsh.data
+class APICreateMixin(object):
 
     def get_post_response(self, **kwargs):
         ctx = self.req.context
         ctx['request'].update(kwargs)
-        self.obj = self.add_obj(ctx['request'], self.Schema())
-        self.commit()
-        return self.obj.to_dict()
+        obj, schema = self.validate(ctx['request'])
+        ctx['session'].add(obj)
+        ctx['session'].commit()
+        return schema.dump(obj).data
 
 
-class APIResourceControllerMixin(object):
-    def get_id_keyword(self):
-        return '%s_id' % self.model.__table__.name.lower()
-
-    def get_result_one(self, id):
-        return self.model.get_one(id).to_dict()
+class APIRetrieveMixin(object):
 
     def get_one_response(self, **kwargs):
-        return self.get_result_one(kwargs.get(self.get_id_keyword()))
+        self.collect_get_one_params()
+        return self.get_result_one(**kwargs)
+
+    def get_result_one(self, **kwargs):
+        id_column = self.get_id_column()
+        obj = self.Schema.Meta.model.get_one(kwargs.get(id_column))
+        if obj is not None:
+            schema = self.Schema(exclude=[e for e in get_nested_fields(self.Schema) \
+                if e not in self.query_params['include']])
+            return schema.dump(obj).data
+        else:
+            raise falcon.HTTPNotFound
+
+    def collect_get_one_params(self, **kwargs):
+        self.query_params['include'] = self.req.get_param_as_list('include', default=[])
+
+
+class APIUpdateMixin(object):
+
+    def get_put_response(self, **kwargs):
+        id_column = self.get_id_column()
+        obj = self.Schema.Meta.model.get_one(kwargs.get(id_column))
+        ctx = self.req.context
+        if obj is not None:
+            obj, schema = self.validate(ctx['request'], instance=obj, partial=True)
+            ctx['session'].add(obj)
+            ctx['session'].commit()
+            return schema.dump(obj).data
+        else:
+            raise falcon.HTTPNotFound

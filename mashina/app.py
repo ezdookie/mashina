@@ -1,6 +1,5 @@
 import falcon
 from config import settings
-from mashina.routing.router import MashinaRouter
 from mashina.routing.base import root_routes
 from mashina.utils.misc import import_string
 
@@ -16,7 +15,6 @@ class App(falcon.API):
 
     def __init__(self):
         super().__init__(
-            router=MashinaRouter(),
             middleware=self.get_middlewares()
         )
         self.add_routes()

@@ -11,7 +11,3 @@ class SQLAlchemySessionMiddleware(object):
             if not req_succeeded:
                 req.context['session'].rollback()
             Session.remove()
-        # if hasattr(resource, 'session'):
-        #     if not req_succeeded:
-        #         resource.session.rollback()
-        #     Session.remove()

@@ -1,40 +1,23 @@
-from mashina.controllers.mixins import APICollectionGETMixin, APICollectionPOSTMixin, \
-    APIResourceControllerMixin
+import falcon
 
 
 class APIBaseController(object):
 
-    def __init__(self, controller_type, exclude=None, *args, **kwargs):
-        self.controller_type = controller_type
-        self.excluded_methods = exclude or []
-        self.model = self.Schema.Meta.model
+    def __init__(self, Schema, *args, **kwargs):
+        self.Schema = Schema
+        self.query_params = {}
+        self.objects_count = 0
 
-    def initialize(self, req, resp, **kwargs):
-        self.req = req
-        self.resp = resp
-        if kwargs:
-            self.req.context['request'].update(kwargs)
+    def get_schema(self, *args, **kwargs):
+        return self.Schema(*args, **kwargs)
 
-    @property
-    def Schema(self):
-        raise NotImplementedError
+    def validate(self, data, partial=False, instance=None):
+        schema = self.get_schema()
+        marsh = schema.load(data, partial=partial, instance=instance)
+        if marsh.errors:
+            print (marsh.errors)
+            raise falcon.HTTPBadRequest('Validation error', marsh.errors)
+        return marsh.data, schema
 
-
-class APIController(APICollectionGETMixin, APICollectionPOSTMixin, \
-        APIResourceControllerMixin, APIBaseController):
-
-    def on_post(self, req, resp, **kwargs):
-        self.initialize(req, resp, **kwargs)
-        resp.context['response'] = self.get_post_response(**kwargs)
-
-    def on_get_one(self, req, resp, **kwargs):
-        self.initialize(req, resp, **kwargs)
-        resp.context['response'] = self.get_one_response(**kwargs)
-
-    def on_put_one(self, req, resp, **kwargs):
-        self.initialize(req, resp, **kwargs)
-        print ('on_put_one')
-
-    def on_delete_one(self, req, resp, **kwargs):
-        self.initialize(req, resp, **kwargs)
-        print ('on_delete_one')
+    def get_id_column(self):
+        return '%s_id' % self.Schema.Meta.model.__table__.name.lower()

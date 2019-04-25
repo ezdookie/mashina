@@ -1,15 +1,10 @@
-import uuid
-import datetime
-import decimal
-import uuid
+from mashina.utils.marshmallow import OptCachedNested
 
 
-def json_serializer(obj):
-    if isinstance(obj, datetime.datetime):
-        return str(obj)
-    elif isinstance(obj, decimal.Decimal):
-        return str(obj)
-    elif isinstance(obj, uuid.UUID):
-        return str(obj)
-
-    raise TypeError('Cannot serialize {!r} (type {})'.format(obj, type(obj)))
+def get_nested_fields(Schema, parent=None):
+    nested = []
+    for f_n, f_o in Schema._declared_fields.items():
+        if type(f_o) == OptCachedNested:
+            nested.append(f_n if not parent else '%s.%s' % (parent, f_n))
+            nested.extend(get_nested_fields(f_o.schema, parent=f_n))
+    return nested

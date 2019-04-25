@@ -1,40 +1,9 @@
-from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
-from sqlalchemy import Column, Integer, or_
+from sqlalchemy import or_
+from sqlalchemy.ext.declarative import declarative_base
 from mashina.db import Session
 
 
 class _Base(object):
-
-    def to_dict(self, include=None, backref=None):
-        res = {column.key: getattr(self, attr)
-               for attr, column in self.__mapper__.c.items()}
-
-        if include is not None:
-            for attr, relation in self.__mapper__.relationships.items():
-                if attr in include:
-                    if backref == relation.table:
-                        continue
-                    value = getattr(self, attr)
-                    if value is None:
-                        res[relation.key] = None
-                    elif isinstance(value.__class__, DeclarativeMeta):
-                        res[relation.key] = value.to_dict(backref=self.__table__, include=include)
-                    else:
-                        res[relation.key] = [i.to_dict(backref=self.__table__, include=include)
-                                             for i in value]
-
-        return res
-
-    # def to_json(self, rel=None):
-    #     def extended_encoder(x):
-    #         if isinstance(x, datetime):
-    #             return x.isoformat()
-    #         if isinstance(x, UUID):
-    #             return str(x)
-    #
-    #     if rel is None:
-    #         rel = self.RELATIONSHIPS_TO_DICT
-    #     return json.dumps(self.to_dict(rel), default=extended_encoder)
 
     @classmethod
     def all(cls, limit=20, offset=0, order_by=None, filters=None, exact_filters=None):
@@ -49,7 +18,7 @@ class _Base(object):
             if order_by.startswith('-'):
                 _order_by = _order_by.desc()
             queryset = queryset.order_by(_order_by)
-        return queryset.count(), queryset.limit(limit).offset(offset).all()
+        return queryset.count(), queryset.limit(limit).offset(offset)
 
     @classmethod
     def count(cls):
@@ -61,7 +30,11 @@ class _Base(object):
 
     @classmethod
     def get_by(cls, **kwargs):
-        return Session.query(cls).filter_by(**kwargs).first()
+        return Session.query(cls).filter_by(**kwargs).one_or_none()
+
+    @classmethod
+    def filter(cls, *args):
+        return Session.query(cls).filter(*args)
 
 
 Base = declarative_base(cls=_Base)

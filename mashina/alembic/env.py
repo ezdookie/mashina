@@ -9,7 +9,10 @@ from importlib import import_module
 from config import settings
 
 for app in settings.APPS:
-    import_module('%s.models' % app)
+    try:
+        import_module('%s.models' % app)
+    except:
+        pass
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
