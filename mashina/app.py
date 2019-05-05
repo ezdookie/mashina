@@ -13,8 +13,14 @@ class App(falcon.API):
     def get_middlewares(self):
         return [import_string(middleware)() for middleware in settings.MIDDLEWARE]
 
+    def get_req_options(self):
+        options = falcon.RequestOptions()
+        options.auto_parse_qs_csv = True
+        return options
+
     def __init__(self):
         super().__init__(
             middleware=self.get_middlewares()
         )
         self.add_routes()
+        self.req_options = self.get_req_options()
