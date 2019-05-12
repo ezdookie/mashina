@@ -25,7 +25,7 @@ class APIListMixin(object):
             limit=self.query_params['limit'],
             offset=self.query_params['offset'],
             filters=self.query_params.get('filters'),
-            exact_filters=self.query_params['exact_filters']
+            static_filters=self.query_params['static_filters']
         )
         return objects_count, schema.dump(objs).data
 
@@ -37,7 +37,7 @@ class APIListMixin(object):
         self.query_params['include'] = self.req.get_param_as_list('include', default=[])
         self.query_params['limit'] = self.req.get_param_as_int('limit', default=20)
         self.query_params['offset'] = self.req.get_param_as_int('offset', default=0)
-        self.query_params['exact_filters'] = {**kwargs, **self.req.context.get('exact_filters', {})}
+        self.query_params['static_filters'] = {**kwargs, **self.req.context.get('static_filters', {})}
 
     def get_next_page(self):
         limit, offset = self.query_params['limit'], self.query_params['offset']+self.query_params['limit']

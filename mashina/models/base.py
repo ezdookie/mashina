@@ -6,13 +6,14 @@ from mashina.db import Session
 class _Base(object):
 
     @classmethod
-    def all(cls, limit=20, offset=0, order_by=None, filters=None, exact_filters=None):
+    def all(cls, limit=20, offset=0, order_by=None, filters=None, static_filters=None):
         queryset = Session.query(cls)
         if filters:
             _filters = [getattr(cls, k).like('%%%s%%' % v) for k, v in filters.items()]
             queryset = queryset.filter(or_(*_filters))
-        if exact_filters:
-            queryset = queryset.filter_by(**exact_filters)
+        if static_filters:
+            static_filters = {k: v for k, v in static_filters.items() if hasattr(cls, k)}
+            queryset = queryset.filter_by(**static_filters)
         if order_by:
             _order_by = getattr(cls, order_by[1:] if order_by.startswith('-') else order_by)
             if order_by.startswith('-'):
