@@ -81,11 +81,14 @@ class APIRetrieveMixin(object):
 
     def get_one_response(self, **kwargs):
         self.collect_get_one_params()
-        return self.get_result_one(**kwargs)
+        return self.get_one_result(**kwargs)
 
-    def get_result_one(self, **kwargs):
+    def get_one_queryset(self, **kwargs):
         id_column = self.get_id_column()
-        obj = self.Schema.Meta.model.get_one(kwargs.get(id_column))
+        return self.Schema.Meta.model.get_one(kwargs.get(id_column))
+
+    def get_one_result(self, **kwargs):
+        obj = self.get_one_queryset(**kwargs)
         if obj is not None:
             schema = self.Schema(exclude=[e for e in get_nested_fields(self.Schema) \
                 if e not in self.query_params['include']])
