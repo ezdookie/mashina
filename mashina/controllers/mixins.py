@@ -113,3 +113,13 @@ class APIUpdateMixin(object):
             return schema.dump(obj).data
         else:
             raise falcon.HTTPNotFound
+
+
+class APIDeleteMixin(object):
+
+    def get_delete_response(self, **kwargs):
+        session = self.req.context['session']
+        id_column = self.get_id_column()
+        obj = self.Schema.Meta.model.get_one(kwargs.get(id_column))
+        session.delete(obj)
+        session.commit()
