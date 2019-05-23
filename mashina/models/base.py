@@ -22,10 +22,6 @@ class _Base(object):
         return queryset.count(), queryset.limit(limit).offset(offset)
 
     @classmethod
-    def count(cls):
-        return Session.query(cls).count()
-
-    @classmethod
     def get_one(cls, id):
         return Session.query(cls).get(id)
 
@@ -36,6 +32,10 @@ class _Base(object):
     @classmethod
     def filter(cls, *args):
         return Session.query(cls).filter(*args)
+
+    @classmethod
+    def filter_by(cls, **kwargs):
+        return Session.query(cls).filter_by(**kwargs)
 
 
 Base = declarative_base(cls=_Base)
