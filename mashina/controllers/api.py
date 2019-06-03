@@ -12,6 +12,12 @@ class APIListCreateController(APICreateMixin, APIListMixin, APIBaseController):
         resp.context['response'] = self.get_post_response(**kwargs)
 
 
+class APIListController(APIListMixin, APIBaseController):
+
+    def on_get(self, req, resp, **kwargs):
+        self.resp.context['response'] = self.get_response(**kwargs)
+
+
 class APIRUDController(APIUpdateMixin, APIDeleteMixin, APIRetrieveMixin, \
         APIBaseController):
 
@@ -23,3 +29,9 @@ class APIRUDController(APIUpdateMixin, APIDeleteMixin, APIRetrieveMixin, \
 
     def on_delete(self, req, resp, **kwargs):
         resp.context['response'] = self.get_delete_response(**kwargs)
+
+
+class APIRetrieveController(APIRetrieveMixin, APIBaseController):
+
+    def on_get(self, req, resp, **kwargs):
+        resp.context['response'] = self.get_one_response(**kwargs)
