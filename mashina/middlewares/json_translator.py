@@ -11,9 +11,11 @@ class JSONTranslatorMiddleware(object):
         body = req.stream.read()
         if not body:
             raise falcon.HTTPBadRequest(
-                'Empty request body. A valid JSON document is required.'
+                'Empty request body',
+                'A valid JSON document is required.'
             )
         req.context['request'] = json.loads(body)
 
     def process_response(self, req, resp, resource, req_succeeded):
-        resp.body = json.dumps(resp.context.get('response'))
+        if req_succeeded:
+            resp.body = json.dumps(resp.context.get('response'))

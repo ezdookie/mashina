@@ -15,7 +15,6 @@ class APIBaseController(object):
         schema = self.get_schema()
         marsh = schema.load(data, partial=partial, instance=instance)
         if marsh.errors:
-            print (marsh.errors)
             raise falcon.HTTPBadRequest('Validation error', marsh.errors)
         return marsh.data, schema
 
