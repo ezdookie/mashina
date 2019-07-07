@@ -7,14 +7,12 @@ from mashina.models.seeds import do_seed
 def main():
     pass
 
-
 @main.command()
 @click.argument('singular')
 @click.argument('plural')
 def generate(singular, plural):
     generate_app_folder(['controllers', 'models', 'routes', 'schemas'], singular, plural)
     click.echo('App successfully created...!')
-
 
 @main.command()
 @click.argument('file_name')

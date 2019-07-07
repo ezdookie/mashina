@@ -5,7 +5,7 @@ from mashina.utils.serialize import get_nested_fields
 class APIListMixin(object):
 
     def get_response(self, **kwargs):
-        self.collect_get_params()
+        self.collect_get_params(**kwargs)
         self.objects_count, results = self.get_results()
         return {
             'count': self.objects_count,
@@ -70,11 +70,10 @@ class APICreateMixin(object):
 
     def get_post_response(self, **kwargs):
         ctx = self.req.context
-        ctx['request'].update(kwargs)
-        obj, schema = self.validate(ctx['request'])
-        ctx['session'].add(obj)
+        self.created_obj, schema = self.validate(ctx['request'])
+        ctx['session'].add(self.created_obj)
         ctx['session'].commit()
-        return schema.dump(obj).data
+        return schema.dump(self.created_obj).data
 
 
 class APIRetrieveMixin(object):
@@ -104,13 +103,13 @@ class APIUpdateMixin(object):
 
     def get_put_response(self, **kwargs):
         id_column = self.get_id_column()
-        obj = self.Schema.Meta.model.get_one(kwargs.get(id_column))
+        _updated_obj = self.Schema.Meta.model.get_one(kwargs.get(id_column))
         ctx = self.req.context
-        if obj is not None:
-            obj, schema = self.validate(ctx['request'], instance=obj, partial=True)
-            ctx['session'].add(obj)
+        if _updated_obj is not None:
+            self.updated_obj, schema = self.validate(ctx['request'], instance=_updated_obj, partial=True)
+            ctx['session'].add(self.updated_obj)
             ctx['session'].commit()
-            return schema.dump(obj).data
+            return schema.dump(self.updated_obj).data
         else:
             raise falcon.HTTPNotFound
 
@@ -120,6 +119,6 @@ class APIDeleteMixin(object):
     def get_delete_response(self, **kwargs):
         session = self.req.context['session']
         id_column = self.get_id_column()
-        obj = self.Schema.Meta.model.get_one(kwargs.get(id_column))
-        session.delete(obj)
+        self.deleted_obj = self.Schema.Meta.model.get_one(kwargs.get(id_column))
+        session.delete(self.deleted_obj)
         session.commit()
