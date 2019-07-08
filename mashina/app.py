@@ -19,7 +19,7 @@ class App(falcon.API):
         return options
 
     def __init__(self):
-        super().__init__(
+        super(App, self).__init__(
             middleware=self.get_middlewares()
         )
         self.add_routes()
