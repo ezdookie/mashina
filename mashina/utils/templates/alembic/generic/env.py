@@ -9,7 +9,7 @@ from alembic import context
 from mashina.db import engine
 from mashina.models.base import Base
 from importlib import import_module
-from config import settings
+from mashina.config import settings
 
 # import mashina models
 for app in settings.APPS:

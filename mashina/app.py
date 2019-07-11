@@ -1,5 +1,5 @@
 import falcon
-from config import settings
+from mashina.config import settings
 from mashina.routing.base import root_routes
 from mashina.utils.misc import import_string
 

@@ -1,6 +1,6 @@
 from importlib.util import find_spec
 from mashina.utils.misc import import_string
-from config import settings
+from mashina.config import settings
 
 root_routes = []
 
