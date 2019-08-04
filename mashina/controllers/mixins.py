@@ -83,11 +83,18 @@ class APIRetrieveMixin(object):
         return self.get_one_result(**kwargs)
 
     def get_one_queryset(self, **kwargs):
-        id_column = self.get_id_column()
-        return self.Schema.Meta.model.get_one(kwargs.get(id_column))
+        queryset = None
+        model = self.Schema.Meta.model
+        table_name = model.__table__.name.lower()
+        for param_name, param_value in kwargs.items():
+            if '_' in param_name:
+                _table, _filter_field = param_name.split('_', 1)
+                if table_name == _table:
+                    queryset = model.filter(getattr(model, _filter_field) == param_value)
+        return queryset
 
     def get_one_result(self, **kwargs):
-        obj = self.get_one_queryset(**kwargs)
+        obj = self.get_one_queryset(**kwargs).one_or_none()
         if obj is not None:
             schema = self.Schema(exclude=[e for e in get_nested_fields(self.Schema) \
                 if e not in self.query_params['include']])
@@ -102,8 +109,7 @@ class APIRetrieveMixin(object):
 class APIUpdateMixin(object):
 
     def get_put_response(self, **kwargs):
-        id_column = self.get_id_column()
-        _updated_obj = self.Schema.Meta.model.get_one(kwargs.get(id_column))
+        _updated_obj = self.get_one_queryset(**kwargs).one_or_none()
         ctx = self.req.context
         if _updated_obj is not None:
             self.updated_obj, schema = self.validate(ctx['request'], instance=_updated_obj, partial=True)
@@ -118,7 +124,6 @@ class APIDeleteMixin(object):
 
     def get_delete_response(self, **kwargs):
         session = self.req.context['session']
-        id_column = self.get_id_column()
-        self.deleted_obj = self.Schema.Meta.model.get_one(kwargs.get(id_column))
+        self.deleted_obj = self.get_one_queryset(**kwargs).one_or_none()
         session.delete(self.deleted_obj)
         session.commit()

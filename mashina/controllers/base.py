@@ -17,6 +17,3 @@ class APIBaseController(object):
         if marsh.errors:
             raise falcon.HTTPBadRequest('Validation error', marsh.errors)
         return marsh.data, schema
-
-    def get_id_column(self):
-        return '%s_id' % self.Schema.Meta.model.__table__.name.lower()
