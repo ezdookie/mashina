@@ -88,7 +88,7 @@ class APIRetrieveMixin(object):
         table_name = model.__table__.name.lower()
         for param_name, param_value in kwargs.items():
             if '_' in param_name:
-                _table, _filter_field = param_name.split('_', 1)
+                _table, _filter_field = param_name.rsplit('_', 1)
                 if table_name == _table:
                     queryset = model.filter(getattr(model, _filter_field) == param_value)
         return queryset
