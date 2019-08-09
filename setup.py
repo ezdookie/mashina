@@ -1,3 +1,4 @@
+import mashina
 from setuptools import setup, find_packages
 
 with open('requirements.txt') as f:
@@ -5,7 +6,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='mashina',
-    version='1.0.0',
+    version=mashina.__version__,
     install_requires=requirements,
     packages=find_packages(),
     include_package_data=True
