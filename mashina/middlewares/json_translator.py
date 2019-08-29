@@ -7,9 +7,7 @@ class JSONTranslatorMiddleware(object):
     def process_resource(self, req, resp, resource, params):
         if req.method in ['POST', 'PUT']:
             req.context['request'] = params
-            if req.content_length in (None, 0):
-                return
-            body = req.stream.read()
+            body = req.stream.read(req.content_length or 0)
             if not body:
                 raise falcon.HTTPBadRequest(
                     'Empty request body',
