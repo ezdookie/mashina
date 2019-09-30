@@ -2,7 +2,7 @@
 
 [alembic]
 # path to migration scripts
-script_location = ${script_location}
+script_location = {{ project_name }}:alembic
 
 # template used to generate migration files
 # file_template = %%(rev)s_%%(slug)s
@@ -30,7 +30,6 @@ script_location = ${script_location}
 # to ${script_location}/versions.  When using multiple version
 # directories, initial revisions must be specified with --version-path
 # version_locations = %(here)s/bar %(here)s/bat ${script_location}/versions
-version_locations = %(here)s/migrations
 
 # the output encoding used when revision files
 # are written from script.py.mako

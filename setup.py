@@ -7,6 +7,7 @@ with open('requirements.txt') as f:
 setup(
     name='mashina',
     version=mashina.__version__,
+    scripts=['bin/mashina-admin.py'],
     install_requires=requirements,
     packages=find_packages(),
     include_package_data=True

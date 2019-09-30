@@ -10,22 +10,27 @@ from mashina.config import settings
 def main():
     pass
 
+
 @main.command()
 @click.argument('singular')
 @click.argument('plural')
-def generate(singular, plural):
-    generate_app_folder(['controllers', 'models', 'routes', 'schemas'], singular, plural)
+@click.argument('package')
+def createapp(singular, plural, package):
+    generate_app_folder(singular, plural, package)
     click.echo('App successfully created...!')
+
 
 @main.command()
 @click.argument('file_name')
 def seed(file_name):
     do_seed(file_name)
 
+
 @main.command()
 def migrate():
     alembic_cfg = AlembicConfig(settings.ALEMBIC_CFG_PATH)
     alembic_command.upgrade(alembic_cfg, "head")
+
 
 @main.command()
 @click.option('--message')
