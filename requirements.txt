@@ -5,3 +5,4 @@ click==7.0
 marshmallow==2.19.5
 marshmallow-sqlalchemy==0.17.0
 PyYAML==5.1.2
+Jinja2==2.10.1

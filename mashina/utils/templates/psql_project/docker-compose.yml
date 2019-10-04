@@ -1,0 +1,14 @@
+version: '2.1'
+
+services:
+  db:
+    extends:
+      file: common-services.yml
+      service: common_postgres_db
+
+  api:
+    extends:
+      file: common-services.yml
+      service: common_api
+    depends_on:
+      - db
