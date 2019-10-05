@@ -1,3 +1,1 @@
 recursive-include mashina/utils/templates/ *
-global-exclude __pycache__
-global-exclude *.py[co]
