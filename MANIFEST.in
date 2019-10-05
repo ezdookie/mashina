@@ -1,1 +1,1 @@
-include mashina/utils/templates/*
+recursive-include mashina/utils/templates/ *
