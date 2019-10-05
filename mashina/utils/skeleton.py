@@ -4,11 +4,12 @@ from jinja2 import Template, Environment, FileSystemLoader
 
 
 def generate_project_folder(project_name):
-    src_path = os.path.join(os.path.dirname(__file__), 'templates/psql_project')
+    src_path = os.path.join(os.path.dirname(__file__), 'templates/psql_project/')
     env = Environment(loader=FileSystemLoader(src_path))
-    hidden_files = [src_path + '/api/.dockerignore']
+    hidden_files = [src_path + h_file for h_file in \
+        ('.gitignore', 'api/.dockerignore')]
 
-    for f in glob(src_path + '/**', recursive=True) + hidden_files:
+    for f in glob(src_path + '**', recursive=True) + hidden_files:
         _file = os.path.relpath(f, src_path)
         _file_replaced = _file.replace('project_name', project_name)
         if os.path.isdir(f):
@@ -24,13 +25,13 @@ def generate_project_folder(project_name):
 
 
 def generate_app_folder(singular, plural, package):
-    src_path = os.path.join(os.path.dirname(__file__), 'templates/app')
+    src_path = os.path.join(os.path.dirname(__file__), 'templates/app/')
     env = Environment(loader=FileSystemLoader(src_path))
 
     dst_path = os.path.join(*package.split('.'), plural)
     os.makedirs(dst_path)
 
-    for f in glob(src_path + '/**', recursive=True):
+    for f in glob(src_path + '**', recursive=True):
         if os.path.isfile(f):
             _file = os.path.relpath(f, src_path)
             template = env.get_template(_file)
