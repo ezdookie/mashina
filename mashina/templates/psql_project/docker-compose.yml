@@ -1,0 +1,16 @@
+version: '2.1'
+
+services:
+  db:
+    extends:
+      file: common-services.yml
+      service: common_postgres_db
+
+  api:
+    extends:
+      file: common-services.yml
+      service: common_api
+    ports:
+      - "9066:9066"
+    depends_on:
+      - db

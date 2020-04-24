@@ -1,9 +1,10 @@
 import click
-from alembic.config import Config as AlembicConfig
 from alembic import command as alembic_command
-from mashina.utils.skeleton import generate_app_folder
-from mashina.models.seeds import do_seed
+from alembic.config import Config as AlembicConfig
+
 from mashina.config import settings
+from mashina.utils.generator import generate_app_folder
+from mashina.utils.seeds import do_seed
 
 
 @click.group()
@@ -14,10 +15,9 @@ def main():
 @main.command()
 @click.argument('singular')
 @click.argument('plural')
-@click.argument('package')
-def createapp(singular, plural, package):
-    generate_app_folder(singular, plural, package)
-    click.echo('App successfully created...!')
+def createapp(singular, plural):
+    generate_app_folder(singular, plural)
+    click.secho('App successfully created!', fg='green')
 
 
 @main.command()
@@ -33,7 +33,7 @@ def migrate():
 
 
 @main.command()
-@click.option('--message')
-def makemigrations(message):
+@click.argument('message')
+def makemigration(message):
     alembic_cfg = AlembicConfig(settings.ALEMBIC_CFG_PATH)
     alembic_command.revision(config=alembic_cfg, message=message, autogenerate=True)

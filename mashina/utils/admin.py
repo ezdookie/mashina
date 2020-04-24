@@ -1,5 +1,6 @@
 import click
-from mashina.utils.skeleton import generate_project_folder
+
+from mashina.utils.generator import generate_project_folder
 
 
 @click.group()
@@ -11,4 +12,4 @@ def main():
 @click.argument('name')
 def startproject(name):
     generate_project_folder(name)
-    click.echo('Project successfully created...!')
+    click.secho('Project successfully created!', fg='green')

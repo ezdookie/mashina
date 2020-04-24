@@ -1,9 +1,8 @@
 import os
-import importlib
+from importlib import import_module
 
 
 class LazySettings(object):
-
     def __init__(self):
         self._wrapped = None
 
@@ -15,7 +14,7 @@ class LazySettings(object):
 
 class Settings(object):
     def __init__(self):
-        mod = importlib.import_module(os.getenv('MASHINA_SETTINGS_MODULE'))
+        mod = import_module(os.environ.get('MASHINA_SETTINGS_MODULE'))
         for setting in dir(mod):
             if setting.isupper():
                 setattr(self, setting, getattr(mod, setting))

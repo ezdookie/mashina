@@ -2,6 +2,7 @@ from mashina.db import Session
 
 
 class SQLAlchemySessionMiddleware(object):
+
     def process_resource(self, req, resp, resource, params):
         req.context['session'] = Session()
 

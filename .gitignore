@@ -2,7 +2,6 @@
 *.pyc
 *.egg-info/
 __pycache__/
-/.idea/
-/venv/
-/build/
-/dist/
+.idea/
+venv/
+.pytest_cache/

@@ -3,12 +3,8 @@ class CORSComponent(object):
         resp.set_header('Access-Control-Allow-Origin', '*')
 
         if (req_succeeded
-            and req.method == 'OPTIONS'
-            and req.get_header('Access-Control-Request-Method')
-        ):
-            # NOTE(kgriffs): This is a CORS preflight request. Patch the
-            #   response accordingly.
-
+                and req.method == 'OPTIONS'
+                and req.get_header('Access-Control-Request-Method')):
             allow = resp.get_header('Allow')
             resp.delete_header('Allow')
 

@@ -1,8 +1,9 @@
 import uuid
+
 from sqlalchemy import Column, Integer, DateTime
-from sqlalchemy.sql import func
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.sql import func
+
 from mashina.models.custom import GUID
 
 
