@@ -8,9 +8,12 @@ from mashina.utils.db import get_class_by_tablename
 
 
 class APIBaseController(object):
-    def __init__(self, Serializer):
-        self.Serializer = Serializer
-        self.paginator = None
+    Serializer = None
+    paginator = None
+
+    def __init__(self, Serializer=None):
+        if Serializer is not None:
+            self.Serializer = Serializer
 
     def get_payload(self, req, **kwargs):
         data = req.context['request']
