@@ -31,7 +31,10 @@ class SqlAlchemyFilter(object):
 
         # url kwargs filter
         for param_name, param_value in kwargs.items():
-            if '__' in param_name:
+            if param_name.startswith('m2m__'):
+                _, rel, field = param_name.split('__')
+                filters.append(getattr(self.Serializer.Meta.model, rel).any(**{field: param_value}))
+            elif '__' in param_name:
                 table_name, field = param_name.split('__')
                 if table_name == self.Serializer.Meta.model.__tablename__:
                     filters.append(getattr(self.Serializer.Meta.model, field) == param_value)
