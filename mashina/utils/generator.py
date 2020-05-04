@@ -31,7 +31,7 @@ def generate_app_folder(singular, plural, path=None):
     src_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'app')
     env = Environment(loader=FileSystemLoader(src_path))
 
-    _path = os.path.dirname(sys.argv[0]) if not path else os.path.join(*path)
+    _path = os.path.dirname(os.path.realpath(sys.argv[0])) if not path else os.path.join(*path)
     apps_path = os.path.join(_path, 'apps')
 
     app_package = '%s.apps.%s' % (os.path.basename(_path), plural)
