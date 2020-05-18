@@ -1,6 +1,7 @@
 import os
 
 import pytest
+from click.testing import CliRunner
 from falcon import testing
 
 
@@ -10,7 +11,7 @@ def setup_db():
     from mashina.commands import migrate
     runner = CliRunner()
 
-    result = runner.invoke((migrate))
+    result = runner.invoke(migrate)
     assert result.exit_code == 0
 
     yield 1

@@ -36,7 +36,7 @@ def setup_db(project):
     result = runner.invoke(makemigration, ['initial'])
     assert result.exit_code == 0
 
-    result = runner.invoke((migrate))
+    result = runner.invoke(migrate)
     assert result.exit_code == 0
 
     yield 1
